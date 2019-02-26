@@ -6,15 +6,20 @@ const graphiqlExpress = require('graphql-server-express').graphiqlExpress;
 const makeExecutableSchema = require('graphql-tools').makeExecutableSchema;
 const MongoClient = require('mongodb').MongoClient;
 const ObjectId = require('mongodb').ObjectID;
+const moment = require("moment");
 
 const prepare = (o) => {
+  if (!o) {
+    return {};
+  }
   o._id = o._id.toString()
   return o
 }
 
-// const url = 'mongodb://localhost:27017';
+console.log(process.env.NODE_ENV)
+const url = 'mongodb://localhost:27017';
 // const url = 'mongodb+srv://graphap-329:kphMP1IVi6ILsqRI@graphql-n2cts.mongodb.net/test?retryWrites=true'
-const url = 'mongodb://graphap-329:kphMP1IVi6ILsqRI@graphql-shard-00-00-n2cts.mongodb.net:27017,graphql-shard-00-01-n2cts.mongodb.net:27017,graphql-shard-00-02-n2cts.mongodb.net:27017/test?ssl=true&replicaSet=graphql-shard-0&authSource=admin&retryWrites=true'
+// const url = 'mongodb://graphap-329:kphMP1IVi6ILsqRI@graphql-shard-00-00-n2cts.mongodb.net:27017,graphql-shard-00-01-n2cts.mongodb.net:27017,graphql-shard-00-02-n2cts.mongodb.net:27017/test?ssl=true&replicaSet=graphql-shard-0&authSource=admin&retryWrites=true'
 const app = express();
 app.use(cors());
 
@@ -33,12 +38,14 @@ MongoClient.connect(url, { useNewUrlParser: true }, (err, client) => {
         _id: String
         title: String
         content: String
+        creatAt: String
         comments: [Comment]
       }
       type Comment {
         _id: String
         postId: String
         content: String
+        creatAt: String
         post: Post
       }
       type Query {
@@ -80,10 +87,12 @@ MongoClient.connect(url, { useNewUrlParser: true }, (err, client) => {
     },
     Mutation: {
       createPost: async (root, args, context, info) => {
+        args.creatAt = moment().unix();
         const res = await Posts.insertOne(args);
         return prepare(await Posts.findOne({ _id: res.insertedId }))
       },
       createComment: async (root, args) => {
+        args.creatAt = moment().unix();
         const res = await Comments.insertOne(args)
         return prepare(await Comments.findOne({ _id: res.insertedId }))
       },
