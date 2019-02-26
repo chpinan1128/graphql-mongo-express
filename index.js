@@ -16,10 +16,15 @@ const prepare = (o) => {
   return o
 }
 
-console.log(process.env.NODE_ENV)
-const url = 'mongodb://localhost:27017';
-// const url = 'mongodb+srv://graphap-329:kphMP1IVi6ILsqRI@graphql-n2cts.mongodb.net/test?retryWrites=true'
-// const url = 'mongodb://graphap-329:kphMP1IVi6ILsqRI@graphql-shard-00-00-n2cts.mongodb.net:27017,graphql-shard-00-01-n2cts.mongodb.net:27017,graphql-shard-00-02-n2cts.mongodb.net:27017/test?ssl=true&replicaSet=graphql-shard-0&authSource=admin&retryWrites=true'
+
+let url = 'mongodb://localhost:27017';
+
+if (process.env.NODE_ENV === 'production') {
+  url = 'mongodb://graphap-329:kphMP1IVi6ILsqRI@graphql-shard-00-00-n2cts.mongodb.net:27017,graphql-shard-00-01-n2cts.mongodb.net:27017,graphql-shard-00-02-n2cts.mongodb.net:27017/test?ssl=true&replicaSet=graphql-shard-0&authSource=admin&retryWrites=true';
+}
+
+console.log(url)
+
 const app = express();
 app.use(cors());
 
