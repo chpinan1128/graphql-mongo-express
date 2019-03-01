@@ -8,6 +8,9 @@ const MongoClient = require('mongodb').MongoClient;
 const ObjectId = require('mongodb').ObjectID;
 const moment = require("moment");
 
+const multer  = require('multer')
+const upload = multer({ dest: 'uploads/' })
+
 const prepare = (o) => {
   if (!o) {
     return {};
@@ -112,6 +115,11 @@ MongoClient.connect(url, { useNewUrlParser: true }, (err, client) => {
   app.use('/graphiql', graphiqlExpress({
     endpointURL: '/graphql'
   }));
+
+  app.post('/thumb', upload.single('thumb'), (req, res) => {
+    console.log(req.file);
+    res.send({ url: 'success' });
+  });
 
 });
 const port = process.env.PORT || 4000
